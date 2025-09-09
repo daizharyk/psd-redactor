@@ -149,7 +149,6 @@
 }
 
 .radio {
- 
   top: 20px;
 }
 .radioContainer::-webkit-scrollbar-track {
@@ -217,4 +216,10 @@
   margin-top: 12px;
   outline: none;
   border-radius: 6px;
+}
+
+@media (max-width: 450px) {
+  .radioContainer {
+    width: 100%;
+  }
 }
