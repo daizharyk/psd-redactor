@@ -5,9 +5,15 @@ export function processText(text) {
 
   let result = text;
 
+  // Ищем "Project n: C-" и за ним любое число, заменяем на "Project n: CMG-" + число
+  result = result.replace(/(Project n:\s*)C-(\d+)/gi, "$1CMG-$2");
+
+  result = result.replace(/Waarde Cu gextrapoleerd/g, "");
   result = result.replace(/fracttionb/g, "fraction");
   result = result.replace(/\(10U\(s10h3T/g, "");
   result = result.replace(/\(10U\(s16\.66h0T/g, "");
+  result = result.replace(/\(10U\(s0p10h4099T&l6D/g, "");
+  result = result.replace(/\(10U\(s0p17h4099T&l12D/g, "");
   result = result.replace(/Diepte/gi, "Depth"); // заменить hello на привет
   result = result.replace(/Zandfractie/gi, "Sand fraction"); // заменить hello на привет
   result = result.replace(/Fijnheidsgetal/gi, "Fineness"); // заменить hello на привет
@@ -48,6 +54,21 @@ export function processText(text) {
   );
 
   result = result.replace(/(Project n:.*)/g, "\n\n\n$1");
+
+  // убираем ведущие пробелы и невидимые символы у строк, начинающихся с M2000, M63, Dm
+  result = result
+    .split("\n")
+    .map((line) => {
+      const cleanLine = line.replace(
+        /[\u0000-\u001F\u007F-\u009F\u00A0\uFEFF\u200B]+/g,
+        ""
+      ); // убираем битые символы
+      if (/^(M2000|M63|Dm)\s*:/.test(cleanLine)) {
+        return cleanLine; // прижимаем к левому краю
+      }
+      return line; // остальные строки оставляем как есть
+    })
+    .join("\n");
 
   // удаляем пустые строки перед "Made By" и добавляем 3 пустые строки перед самим текстом
   result = result.replace(/(\s*\n)*\s*(Made By.*)/g, "\n\n\n\n\n\n\n$2");

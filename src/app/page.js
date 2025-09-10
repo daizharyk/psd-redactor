@@ -24,6 +24,9 @@ export default function Home() {
   const [currentStation, setCurrentStation] = useState(null);
   const [isPlaying, setIsPlaying] = useState(false);
   const audioRef = useRef(null);
+  let hasAddedPSD = false;
+  let firstProjectName = "";
+  let finalMadeByBlock = [];
 
   const handlePlayPause = (stationUrl) => {
     const audio = audioRef.current;
@@ -110,15 +113,22 @@ export default function Home() {
     if (!fileContent) return;
 
     // чистим текст от мусора
-    const cleanText = fileContent.replace(
-      /[^\x20-\x7E\u0400-\u04FF\n\r\t]/g,
-      ""
-    );
+    let cleanText = fileContent.replace(/[^\x20-\x7E\u0400-\u04FF\n\r\t]/g, "");
+
+    // 2. Прижимаем M2000 к левому краю, остальные строки без изменений
+    cleanText = cleanText
+      .split("\n")
+      .map((line) => {
+        if (/^\s*M2000\s*:/.test(line)) {
+          return line.trimStart();
+        }
+        return line;
+      })
+      .join("\n");
 
     const paragraphs = [];
-    const lines = cleanText.split(/\r?\n/);
+    let lines = cleanText.split(/\r?\n/);
 
-    // заголовки для табличных блоков
     const tableHeaders = [
       "Time (sec):",
       "Reading",
@@ -133,46 +143,85 @@ export default function Home() {
 
       // === 1. Проверяем "PARTICLE SIZE DISTRIBUTION" ===
       if (/^PARTICLE SIZE DISTRIBUTION\s*$/i.test(trimmed)) {
-        paragraphs.push(
-          new Paragraph({
-            alignment: AlignmentType.CENTER,
-            children: [
-              new TextRun({
-                text: "PARTICLE SIZE DISTRIBUTION",
-                font: "Courier New",
-                size: 16,
-              }),
-            ],
-          })
-        );
-
-        // ищем проектное имя
-        let projectName = "";
-        for (let j = i + 1; j < lines.length; j++) {
-          if (lines[j].trim()) {
-            projectName = lines[j].trim();
-            i = j; // чтобы не продублировать
-            break;
-          }
-        }
-
-        if (projectName) {
+        if (!hasAddedPSD) {
+          // добавляем только один раз
           paragraphs.push(
             new Paragraph({
               alignment: AlignmentType.CENTER,
               children: [
                 new TextRun({
-                  text: projectName,
+                  text: "PARTICLE SIZE DISTRIBUTION",
                   font: "Courier New",
                   size: 16,
                 }),
               ],
             })
           );
+
+          for (let j = i + 1; j < lines.length; j++) {
+            const nextLine = lines[j].trim();
+            if (nextLine) {
+              firstProjectName = nextLine; // сохраняем глобально
+              paragraphs.push(
+                new Paragraph({
+                  alignment: AlignmentType.CENTER,
+                  children: [
+                    new TextRun({
+                      text: firstProjectName,
+                      font: "Courier New",
+                      size: 16,
+                    }),
+                  ],
+                })
+              );
+              i = j; // пропускаем эту строку в основном цикле
+              break;
+            }
+          }
+
+          hasAddedPSD = true;
         }
 
-        continue; // переходим к следующей строке
+        continue;
       }
+
+      if (firstProjectName && trimmed === firstProjectName) {
+        continue;
+      }
+
+      if (/^Made By\s+/i.test(trimmed)) {
+        finalMadeByBlock = [];
+        let j = i;
+        // Захватываем блок до пустой строки после "Approved by" или до следующего PSD
+        while (
+          j < lines.length &&
+          lines[j].trim() !== "" &&
+          !/^PARTICLE SIZE DISTRIBUTION\s*$/i.test(lines[j].trim())
+        ) {
+          finalMadeByBlock.push(lines[j]);
+          j++;
+        }
+        i = j - 1;
+        continue;
+      }
+
+      // После того, как мы обработали finalMadeByBlock
+      let newLines = [];
+      let emptyCount = 0;
+
+      for (let line of lines) {
+        if (line.trim() === "") {
+          emptyCount++;
+          if (emptyCount <= 2) {
+            newLines.push(line);
+          }
+        } else {
+          emptyCount = 0;
+          newLines.push(line);
+        }
+      }
+
+      lines = newLines;
 
       // === 2. Проверяем строки для таблиц ===
       const header = tableHeaders.find((h) => trimmed.startsWith(h));
@@ -257,6 +306,23 @@ export default function Home() {
       );
     }
 
+    if (finalMadeByBlock.length > 0) {
+      finalMadeByBlock.forEach((line) => {
+        paragraphs.push(
+          new Paragraph({
+            children: [
+              new TextRun({
+                text: line,
+                font: "Courier New",
+                size: 16,
+              }),
+            ],
+            alignment: AlignmentType.LEFT,
+          })
+        );
+      });
+    }
+
     // превращаем "виртуальные" таблицы в docx.Table
     const docChildren = paragraphs.map((p) => {
       if (p.type === "table") {
@@ -276,8 +342,22 @@ export default function Home() {
       ],
     });
 
+    // ищем номер буровой скважины
+    let boreholeNumber = "";
+    const boreholeMatch = fileContent.match(/Borehole\s*:\s*B\w*-?(\d+)/i);
+    if (boreholeMatch) {
+      console.log("boreholeMatch", boreholeMatch);
+
+      boreholeNumber = boreholeMatch[1]; // получаем только цифры, например "124"
+    }
+
+    const newFileName = boreholeNumber
+      ? `BH-${boreholeNumber}_PSD.docx`
+      : "result_PSD.docx";
+
+    // сохраняем файл
     const blob = await Packer.toBlob(doc);
-    saveAs(blob, (fileName?.replace(/\.[^.]+$/, "") || "result") + ".docx");
+    saveAs(blob, newFileName);
   };
   // отфильтруем дубли
   const uniqueStations = stations.filter(
