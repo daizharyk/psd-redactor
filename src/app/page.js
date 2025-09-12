@@ -1,32 +1,23 @@
 "use client";
 import { useEffect, useRef, useState } from "react";
 import styles from "./page.module.css";
-import {
-  Packer,
-  Document,
-  Paragraph,
-  TextRun,
-  AlignmentType,
-  Table,
-  TableRow,
-  TableCell,
-  WidthType,
-} from "docx";
+import { Packer } from "docx";
 import { saveAs } from "file-saver";
-import mammoth from "mammoth";
+
 import { processText } from "./utils/textProcessor";
+import { buildDocx } from "./utils/textProcessorDocx";
 
 export default function Home() {
   const [fileName, setFileName] = useState("");
   const [fileContent, setFileContent] = useState("");
+  const [docData, setDocData] = useState(null);
   const [file, setFile] = useState(null);
   const [stations, setStations] = useState([]);
   const [currentStation, setCurrentStation] = useState(null);
   const [isPlaying, setIsPlaying] = useState(false);
   const audioRef = useRef(null);
-  let hasAddedPSD = false;
-  let firstProjectName = "";
-  let finalMadeByBlock = [];
+
+  console.log("fileContent", fileContent);
 
   const handlePlayPause = (stationUrl) => {
     const audio = audioRef.current;
@@ -73,289 +64,31 @@ export default function Home() {
     const file = fileInput.files[0];
     const reader = new FileReader();
 
-    if (file.name.endsWith(".docx")) {
-      reader.onload = async (e) => {
-        try {
-          const { value } = await mammoth.extractRawText({
-            arrayBuffer: e.target.result,
-          });
-          const cleanText = value.replace(
-            /[^\x20-\x7E\u0400-\u04FF\n\r\t]/g,
-            ""
-          );
+    reader.onload = (e) => {
+      const rawText = e.target.result;
 
-          // потом обрабатываем твоей функцией
-          const processed = processText(cleanText);
+      const cleanText = rawText.replace(/[^\x20-\x7E\u0400-\u04FF\n\r\t]/g, "");
 
-          setFileContent(processed);
-        } catch (err) {
-          setFileContent("Ошибка при обработке Word файла");
-        }
-      };
-      reader.readAsArrayBuffer(file);
-    } else {
-      reader.onload = (e) => {
-        const rawText = e.target.result;
-        const cleanText = rawText.replace(
-          /[^\x20-\x7E\u0400-\u04FF\n\r\t]/g,
-          ""
-        );
+      const processed = processText(cleanText);
 
-        // потом обрабатываем твоей функцией
-        const processed = processText(cleanText);
-        setFileContent(processed);
-      };
-      reader.readAsText(file, "utf-8");
-    }
+      const result = buildDocx(processed);
+
+      setFileContent(processed);
+      setDocData(result);
+    };
+
+    reader.readAsText(file, "utf-8");
   };
 
   const handleDownload = async () => {
-    if (!fileContent) return;
+    if (!docData) return;
 
-    // чистим текст от мусора
-    let cleanText = fileContent.replace(/[^\x20-\x7E\u0400-\u04FF\n\r\t]/g, "");
-
-    // 2. Прижимаем M2000 к левому краю, остальные строки без изменений
-    cleanText = cleanText
-      .split("\n")
-      .map((line) => {
-        if (/^\s*M2000\s*:/.test(line)) {
-          return line.trimStart();
-        }
-        return line;
-      })
-      .join("\n");
-
-    const paragraphs = [];
-    let lines = cleanText.split(/\r?\n/);
-
-    const tableHeaders = [
-      "Time (sec):",
-      "Reading",
-      "Diameter",
-      "Grams",
-      "Percentage",
-    ];
-    let currentTable = null;
-
-    for (let i = 0; i < lines.length; i++) {
-      const trimmed = lines[i].trim();
-
-      // === 1. Проверяем "PARTICLE SIZE DISTRIBUTION" ===
-      if (/^PARTICLE SIZE DISTRIBUTION\s*$/i.test(trimmed)) {
-        if (!hasAddedPSD) {
-          // добавляем только один раз
-          paragraphs.push(
-            new Paragraph({
-              alignment: AlignmentType.CENTER,
-              children: [
-                new TextRun({
-                  text: "PARTICLE SIZE DISTRIBUTION",
-                  font: "Courier New",
-                  size: 16,
-                }),
-              ],
-            })
-          );
-
-          for (let j = i + 1; j < lines.length; j++) {
-            const nextLine = lines[j].trim();
-            if (nextLine) {
-              firstProjectName = nextLine; // сохраняем глобально
-              paragraphs.push(
-                new Paragraph({
-                  alignment: AlignmentType.CENTER,
-                  children: [
-                    new TextRun({
-                      text: firstProjectName,
-                      font: "Courier New",
-                      size: 16,
-                    }),
-                  ],
-                })
-              );
-              i = j; // пропускаем эту строку в основном цикле
-              break;
-            }
-          }
-
-          hasAddedPSD = true;
-        }
-
-        continue;
-      }
-
-      if (firstProjectName && trimmed === firstProjectName) {
-        continue;
-      }
-
-      if (/^Made By\s+/i.test(trimmed)) {
-        finalMadeByBlock = [];
-        let j = i;
-        // Захватываем блок до пустой строки после "Approved by" или до следующего PSD
-        while (
-          j < lines.length &&
-          lines[j].trim() !== "" &&
-          !/^PARTICLE SIZE DISTRIBUTION\s*$/i.test(lines[j].trim())
-        ) {
-          finalMadeByBlock.push(lines[j]);
-          j++;
-        }
-        i = j - 1;
-        continue;
-      }
-
-      // После того, как мы обработали finalMadeByBlock
-      let newLines = [];
-      let emptyCount = 0;
-
-      for (let line of lines) {
-        if (line.trim() === "") {
-          emptyCount++;
-          if (emptyCount <= 2) {
-            newLines.push(line);
-          }
-        } else {
-          emptyCount = 0;
-          newLines.push(line);
-        }
-      }
-
-      lines = newLines;
-
-      // === 2. Проверяем строки для таблиц ===
-      const header = tableHeaders.find((h) => trimmed.startsWith(h));
-      if (header) {
-        const parts = trimmed.split(/\s+/);
-        const label = parts.shift(); // например, "Time"
-        let maybeColon = "";
-        if (parts[0] && parts[0].endsWith(":")) {
-          maybeColon = parts.shift(); // например, "(sec):"
-        }
-
-        const numbers = parts;
-
-        // создаём ряд таблицы
-        const row = new TableRow({
-          children: [
-            new TableCell({
-              children: [
-                new Paragraph({
-                  children: [
-                    new TextRun({
-                      text: label + (maybeColon ? " " + maybeColon : ""),
-                      font: "Courier New",
-                      size: 16,
-                    }),
-                  ],
-                }),
-              ],
-              width: { size: 15, type: WidthType.PERCENTAGE },
-            }),
-            ...numbers.map(
-              (num) =>
-                new TableCell({
-                  children: [
-                    new Paragraph({
-                      children: [
-                        new TextRun({
-                          text: num,
-                          font: "Courier New",
-                          size: 16,
-                        }),
-                      ],
-                    }),
-                  ],
-                  width: {
-                    size: 85 / numbers.length,
-                    type: WidthType.PERCENTAGE,
-                  },
-                })
-            ),
-          ],
-        });
-
-        // если таблица уже идёт — добавляем строку
-        if (currentTable) {
-          currentTable.tableRows.push(row);
-        } else {
-          // создаём новую таблицу
-          currentTable = { type: "table", tableRows: [row] };
-          paragraphs.push(currentTable);
-        }
-        continue;
-      }
-
-      // === 3. Если строка обычная ===
-      if (currentTable) {
-        // закрываем таблицу, если встретили не табличную строку
-        currentTable = null;
-      }
-
-      paragraphs.push(
-        new Paragraph({
-          children: [
-            new TextRun({
-              text: lines[i], // оставляем как есть, чтобы пробелы сохранились
-              font: "Courier New",
-              size: 16,
-            }),
-          ],
-          alignment: AlignmentType.LEFT,
-        })
-      );
-    }
-
-    if (finalMadeByBlock.length > 0) {
-      finalMadeByBlock.forEach((line) => {
-        paragraphs.push(
-          new Paragraph({
-            children: [
-              new TextRun({
-                text: line,
-                font: "Courier New",
-                size: 16,
-              }),
-            ],
-            alignment: AlignmentType.LEFT,
-          })
-        );
-      });
-    }
-
-    // превращаем "виртуальные" таблицы в docx.Table
-    const docChildren = paragraphs.map((p) => {
-      if (p.type === "table") {
-        return new Table({
-          width: { size: 108, type: WidthType.PERCENTAGE },
-          rows: p.tableRows,
-        });
-      }
-      return p;
-    });
-
-    const doc = new Document({
-      sections: [
-        {
-          children: docChildren,
-        },
-      ],
-    });
-
-    // ищем номер буровой скважины
-    let boreholeNumber = "";
-    const boreholeMatch = fileContent.match(/Borehole\s*:\s*B\w*-?(\d+)/i);
-    if (boreholeMatch) {
-      console.log("boreholeMatch", boreholeMatch);
-
-      boreholeNumber = boreholeMatch[1]; // получаем только цифры, например "124"
-    }
+    const { doc, boreholeNumber } = docData;
 
     const newFileName = boreholeNumber
       ? `BH-${boreholeNumber}_PSD.docx`
       : "result_PSD.docx";
 
-    // сохраняем файл
     const blob = await Packer.toBlob(doc);
     saveAs(blob, newFileName);
   };
@@ -370,10 +103,7 @@ export default function Home() {
       <main className={styles.main}>
         <div className={styles.radio}>
           <h2 className={styles.h2}>Radio</h2>
-          <div
-            onClick={() => handlePlayPause(station.url_resolved)}
-            className={styles.radioContainer}
-          >
+          <div className={styles.radioContainer}>
             {uniqueStations.map((station) => (
               <div
                 onClick={() => handlePlayPause(station.url_resolved)}

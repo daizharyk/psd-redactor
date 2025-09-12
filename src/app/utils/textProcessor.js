@@ -20,6 +20,8 @@ export function processText(text) {
   result = result.replace(/Grammes/gi, "Grams"); // заменить hello на привет
   result = result.replace(/Ucijfer {7}/gi, "U number");
 
+
+
   result = result.replace(
     /(^|\s)[\u0000-\u001F\u007F-\u009F\u00A0\uFEFF\uFFFD]*m[\u0000-\u001F\u007F-\u009F\u00A0\uFEFF\uFFFD]*(?=\s|$)/g,
     (match, leadingWhitespace, offset, fullString) => {
@@ -36,6 +38,7 @@ export function processText(text) {
       return leadingWhitespace + "mm";
     }
   );
+  result = result.replace(/Lab\. Techn\./g, "  Lab. Techn.");
 
   result = result.replace(
     /(^|\n)([^\n]*?)\bCc\b/g,
@@ -63,7 +66,7 @@ export function processText(text) {
         /[\u0000-\u001F\u007F-\u009F\u00A0\uFEFF\u200B]+/g,
         ""
       ); // убираем битые символы
-      if (/^(M2000|M63|Dm)\s*:/.test(cleanLine)) {
+      if (/^(M2000)\s*:/.test(cleanLine)) {
         return cleanLine; // прижимаем к левому краю
       }
       return line; // остальные строки оставляем как есть
