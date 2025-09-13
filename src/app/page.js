@@ -17,7 +17,7 @@ export default function Home() {
   const [isPlaying, setIsPlaying] = useState(false);
   const audioRef = useRef(null);
 
-  console.log("fileContent", fileContent);
+
 
   const handlePlayPause = (stationUrl) => {
     const audio = audioRef.current;

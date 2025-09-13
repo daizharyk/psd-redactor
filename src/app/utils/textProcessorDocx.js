@@ -57,6 +57,9 @@ export function buildDocx(text) {
                 size: 16,
               }),
             ],
+          }),
+          new Paragraph({
+            children: [new TextRun({ text: "" })],
           })
         );
 
@@ -77,6 +80,15 @@ export function buildDocx(text) {
                 ],
               })
             );
+
+            for (let k = 0; k < 3; k++) {
+              paragraphs.push(
+                new Paragraph({
+                  children: [new TextRun({ text: "" })],
+                })
+              );
+            }
+
             i = j;
             break;
           }
