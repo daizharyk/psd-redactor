@@ -1,8 +1,6 @@
 .back {
   border-radius: 10px;
-  position: absolute;
-  top: 25px;
-  left: 25px;
+  
   padding: 12px 20px;
   font-size: 20px;
   border: none;
