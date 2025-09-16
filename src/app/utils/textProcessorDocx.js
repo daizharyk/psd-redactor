@@ -7,8 +7,9 @@ import {
   TableCell,
   AlignmentType,
   WidthType,
-  Packer,
+
 } from "docx";
+
 
 export function buildDocx(text) {
   if (!text) return null;

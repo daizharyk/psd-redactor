@@ -1,0 +1,18 @@
+.back {
+  border-radius: 10px;
+  position: absolute;
+  top: 25px;
+  left: 25px;
+  padding: 12px 20px;
+  font-size: 20px;
+  border: none;
+  margin: 10px 0;
+  color: #fff;
+  background-color: #1d3557;
+  transition: 0.2s all ease-in-out;
+}
+.back:hover {
+  background-color: #000000;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3);
+  cursor: pointer;
+}
