@@ -4,5 +4,10 @@
   margin: 0;
   font-family: monospace;
   background: #669bbc;
-
+}
+.radio {
+  position: absolute;
+  top: 50px;
+  right: 50px;
+  margin-bottom: 50px;
 }

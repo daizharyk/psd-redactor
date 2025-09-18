@@ -1,9 +1,11 @@
 import React from "react";
 import styles from "./page.module.css";
 import Link from "next/link";
+import RadioList from "@/components/RadioList";
 const page = () => {
   return (
     <div className={styles.main}>
+     
       <div className={styles.container}>
         <Link className={styles.button} href="/psd">
           PSD Process

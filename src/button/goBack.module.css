@@ -1,10 +1,10 @@
 .back {
   border-radius: 10px;
-  
+  margin: 20px;
   padding: 12px 20px;
   font-size: 20px;
   border: none;
-  margin: 10px 0;
+
   color: #fff;
   background-color: #1d3557;
   transition: 0.2s all ease-in-out;
