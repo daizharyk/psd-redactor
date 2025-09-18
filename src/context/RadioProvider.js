@@ -10,11 +10,9 @@ export const RadioProvider = ({ children }) => {
   const [currentStation, setCurrentStation] = useState(null);
   const [isPlaying, setIsPlaying] = useState(false);
 
-  // грузим станции один раз
+  // грузим станции через свой backend
   useEffect(() => {
-    fetch(
-      "https://de1.api.radio-browser.info/json/stations/bycountry/Kazakhstan?limit=50"
-    )
+    fetch("/api/radio")
       .then((res) => res.json())
       .then((data) => {
         const filtered = data.filter((station) => station.url_resolved);
@@ -33,12 +31,12 @@ export const RadioProvider = ({ children }) => {
     } else {
       if (currentStation !== stationUrl) {
         audio.pause();
-        audio.currentTime = 0; // сбросить прошлую станцию
+        audio.currentTime = 0;
       }
 
       setCurrentStation(stationUrl);
       audio.src = stationUrl;
-      audio.load(); // гарантируем перезапуск
+      audio.load();
       audio.play().catch((err) => console.log("Play error:", err));
       setIsPlaying(true);
     }
