@@ -7,7 +7,7 @@ export function translatePsdText(text) {
 
   const translationMap = {
     "Particle Size Distribution": "Определение размеров частиц",
-    "Contruction of the 1st gas-chemical complex, Phase II":
+    "Offshore Geotechnical Investigation Kashagan Phase IIA Project":
       "ГЕОТЕХНИЧЕСКИЕ ИЗЫСКАНИЯ НА МОРСКИХ ОБЪЕКТАХ, ПРОЕКТ КАШАГАН ФАЗА IIA",
     "Approved by senior labora": "Утверждено старшим лаборантом",
     "Sample mass (g)": "Масса образца (г)",
@@ -18,9 +18,9 @@ export function translatePsdText(text) {
     "Time (sec):": "Время(сек):",
     "Time (sec)": "Время(сек)",
     "Percentage ": "Процент ",
-    Project: "Проект",
+    "Project ": "Проект     ",
     Date: "Дата",
-    Borehole: "Скважина",
+    Borehole: "Скважина   ",
     Technician: "Техник-лаборант",
     Depth: "Глубина",
     Diameter: "Диаметр",
@@ -29,11 +29,11 @@ export function translatePsdText(text) {
     Reading: "Показание",
     Percentage: "Процент",
     Time: "Время",
-    Sample: "Образец",
+    Sample: "Образец  ",
     Grams: "грамм",
     gram: "грамм",
     December: "Декабрь",
-    November: "Ноябрь",
+    Nov: "Ноябрь",
     October: "Октябрь",
     February: "Февраль",
     September: "Сентябрь",

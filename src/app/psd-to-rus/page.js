@@ -154,9 +154,6 @@ export default function PsdToRus() {
         lastSeenHeader === "summary" &&
         currentTable.length > 0
       ) {
-        console.log(
-          `✂️ РАЗДЕЛЕНИЕ! Diameter после summary, закрываем таблицу из ${currentTable.length} строк`
-        );
         tables.push([...currentTable]);
         currentTable = [];
         lastSeenHeader = "diameter";
@@ -174,13 +171,9 @@ export default function PsdToRus() {
     });
 
     if (currentTable.length > 0) {
-      console.log(
-        `📦 Добавляем последнюю таблицу: ${currentTable.length} строк`
-      );
       tables.push(currentTable);
     }
 
-    console.log(`✅ Итого создано таблиц: ${tables.length}`);
     return tables.length > 0 ? tables : [rows];
   };
 
@@ -206,7 +199,9 @@ export default function PsdToRus() {
           item.text.includes("Определение размеров частиц") ||
           item.text.includes("ГЕОТЕХНИЧЕСКИЕ ИЗЫСКАНИЯ НА МОРСКИХ ОБЪЕКТАХ") ||
           item.text.includes("PARTICLE SIZE DISTRIBUTION") ||
-          item.text.includes("Contruction of the 1st gas-chemical complex");
+          item.text.includes(
+            "Offshore Geotechnical Investigation Kashagan Phase IIA Project"
+          );
 
         const isProjectLine =
           item.text.toLowerCase().startsWith("project") ||
@@ -277,7 +272,7 @@ export default function PsdToRus() {
           new Table({
             rows: tableRows,
             width: {
-              size: 100,
+              size: 108,
               type: WidthType.PERCENTAGE,
             },
           })

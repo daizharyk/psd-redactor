@@ -1,7 +1,7 @@
 import React from "react";
 import styles from "./page.module.css";
 import Link from "next/link";
-import RadioList from "@/components/RadioList";
+
 const page = () => {
   return (
     <div className={styles.main}>
@@ -17,6 +17,9 @@ const page = () => {
         </Link>
         <Link className={styles.button} href="/psd-to-rus">
           PSD to RUS
+        </Link>
+        <Link className={styles.button} href="/att-to-rus">
+          ATT to RUS
         </Link>
       </div>
     </div>

@@ -1,6 +1,5 @@
 import { RadioProvider } from "@/context/RadioProvider";
 import "./globals.css";
-import RadioList from "@/components/RadioList";
 
 export const metadata = {
   title: "CMG Laboratory",
@@ -11,10 +10,7 @@ export default function RootLayout({ children }) {
   return (
     <html lang="en">
       <body>
-        <RadioProvider>
-          <RadioList className={"radio"} />
-          {children}
-        </RadioProvider>
+        <RadioProvider>{children}</RadioProvider>
       </body>
     </html>
   );
