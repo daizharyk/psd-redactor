@@ -184,6 +184,16 @@ export default function PsdToRus() {
     return tables.length > 0 ? tables : [rows];
   };
 
+  function isLine(item, originals = [], translations = []) {
+    const text = item.text?.toLowerCase() || "";
+    const translated = item.translatedText || "";
+
+    return (
+      originals.some((o) => text.startsWith(o.toLowerCase())) ||
+      translations.some((t) => translated.startsWith(t))
+    );
+  }
+
   const handleDownload = async () => {
     if (!docStructure) return;
 
@@ -202,6 +212,23 @@ export default function PsdToRus() {
           item.text.toLowerCase().startsWith("project") ||
           item.translatedText.startsWith("Проект");
 
+        const isProjectLine100 = isLine(
+          item,
+          [
+            "Sample mass (g)",
+            "Sand fraction",
+            "Particle Size Distribution",
+            "PARTICLE SIZE DISTRIBUTION",
+          ],
+          ["Масса образца (г)", "Фракция песка", "Определение размеров частиц"]
+        );
+
+        const isProjectLine100before = isLine(
+          item,
+          ["Sand fraction"], // оригинал
+          ["Фракция песка"] // перевод
+        );
+
         docElements.push(
           new Paragraph({
             children: [
@@ -212,7 +239,11 @@ export default function PsdToRus() {
               }),
             ],
             alignment: isCenterText ? AlignmentType.CENTER : AlignmentType.LEFT,
-            spacing: isProjectLine ? { before: 400 } : undefined,
+            spacing: {
+              ...(isProjectLine && { before: 400 }),
+              ...(isProjectLine100 && { after: 100 }),
+              ...(isProjectLine100before && { before: 100 }),
+            },
           })
         );
       } else if (item.type === "table") {
