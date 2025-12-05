@@ -5,6 +5,8 @@ import { translatePlasticityText } from "../utils/translatePlasticityText";
 import mammoth from "mammoth";
 import { AlignmentType, Document, Packer, Paragraph, TextRun } from "docx";
 import { saveAs } from "file-saver";
+import Styles from "./page.module.css";
+import GoBack from "@/button/goBack";
 // Функция перевода для графиков пластичности
 
 export default function PlasticityTranslator() {
@@ -128,6 +130,7 @@ export default function PlasticityTranslator() {
 
   return (
     <div
+      className={Styles.main}
       style={{
         padding: "40px",
         maxWidth: "900px",
@@ -135,6 +138,7 @@ export default function PlasticityTranslator() {
         fontFamily: "Arial, sans-serif",
       }}
     >
+      <GoBack />
       <script src="https://cdnjs.cloudflare.com/ajax/libs/mammoth/1.6.0/mammoth.browser.min.js"></script>
 
       <h1 style={{ color: "#2c3e50", marginBottom: "30px" }}>
@@ -144,18 +148,7 @@ export default function PlasticityTranslator() {
       <div style={{ marginBottom: "20px" }}>
         <label
           htmlFor="file-upload"
-          style={{
-            display: "inline-block",
-            padding: "12px 24px",
-            backgroundColor: "#3498db",
-            color: "white",
-            borderRadius: "6px",
-            cursor: "pointer",
-            fontSize: "16px",
-            transition: "background-color 0.3s",
-          }}
-          onMouseEnter={(e) => (e.target.style.backgroundColor = "#2980b9")}
-          onMouseLeave={(e) => (e.target.style.backgroundColor = "#3498db")}
+            className={Styles.fileUploadLabel}
         >
           📁 Выбрать файл DOCX
         </label>
@@ -236,7 +229,9 @@ export default function PlasticityTranslator() {
         </div>
       )}
       {translatedText && (
-        <button onClick={handleDownload}>💾 Скачать DOCX</button>
+        <button className={Styles.download} onClick={handleDownload}>
+          💾 Скачать DOCX
+        </button>
       )}
     </div>
   );
