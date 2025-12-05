@@ -139,17 +139,13 @@ export default function PlasticityTranslator() {
       }}
     >
       <GoBack />
-      <script src="https://cdnjs.cloudflare.com/ajax/libs/mammoth/1.6.0/mammoth.browser.min.js"></script>
 
       <h1 style={{ color: "#2c3e50", marginBottom: "30px" }}>
         Переводчик графиков пластичности (ENG → RUS)
       </h1>
 
       <div style={{ marginBottom: "20px" }}>
-        <label
-          htmlFor="file-upload"
-            className={Styles.fileUploadLabel}
-        >
+        <label htmlFor="file-upload" className={Styles.fileUploadLabel}>
           📁 Выбрать файл DOCX
         </label>
         <input
