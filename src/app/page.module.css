@@ -1,6 +1,7 @@
 .main {
   display: flex;
   justify-content: center;
+
   flex-direction: column;
   align-items: center;
   min-height: 100vh;
@@ -16,7 +17,9 @@
 .container {
   text-align: center;
   display: flex;
-  gap: 10px;
+  flex-direction: column;
+  gap: 20px;
+  margin-top: 50px;
 }
 
 .button {
@@ -37,4 +40,3 @@
   transform: translateY(-2px);
   transition: all 0.2s ease;
 }
-
