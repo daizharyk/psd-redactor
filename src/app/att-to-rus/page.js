@@ -87,7 +87,8 @@ export default function PlasticityTranslator() {
 
             const paddingBefore200 =
               cleanLine.includes("Образец Точка отсчета глуб") ||
-              cleanLine.includes("Sample Depth-ref");
+              cleanLine.includes("Sample Depth-ref") ||
+              cleanLine.includes("Среднее значение");
 
             const paddingAfter100 =
               line.includes(
@@ -95,6 +96,14 @@ export default function PlasticityTranslator() {
               ) ||
               line.includes(
                 "Offshore Geotechnical Investigation Kashagan Phase IIA Project"
+              );
+
+            const paddingAfter1000 =
+              line.includes(
+                "Предел текучести     (грамм)     (грамм)     (%)      (N)      (N=25)"
+              ) ||
+              line.includes(
+                "Предел пластичности    (грамм)     (грамм)     (%)"
               );
 
             return new Paragraph({
@@ -110,6 +119,7 @@ export default function PlasticityTranslator() {
                 : AlignmentType.LEFT,
               spacing: {
                 ...(paddingAfter100 && { after: 300 }),
+                ...(paddingAfter1000 && { after: 100 }),
                 ...(isBefore100 && { before: 200 }),
                 ...(paddingBefore300 && { before: 300 }),
                 ...(paddingBefore200 && { before: 200 }),

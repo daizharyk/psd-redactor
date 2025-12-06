@@ -27,8 +27,8 @@ export function translatePlasticityText(text) {
     Date: "Дата",
     Blows: "Удары",
     Plate: "Пластина",
-    gram: "грамм",
-    Wet: "Водонас.",
+    "(gram)": "  (грамм)",
+    Wet: "     Водонас.",
     Dry: "Маловлажн.",
   };
 
