@@ -122,7 +122,7 @@ export default function PlasticityTranslator() {
 
     Packer.toBlob(doc).then((blob) => {
       const newFileName = fileName
-        ? fileName.replace(/\.[^/.]+$/, "") + "_RUS.docx"
+        ? fileName.replace(/\.[^/.]+$/, "") + ".docx"
         : "translated_RUS.docx";
       saveAs(blob, newFileName);
     });
