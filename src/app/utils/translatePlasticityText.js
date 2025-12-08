@@ -18,7 +18,7 @@ export function translatePlasticityText(text) {
     "Water cont": "Влажность",
     "4-point liquid limit test": "4-точечная проверка предела текучести",
     Average: "Среднее значение",
-    "Depth-ref": "Точка отсчета глуб.",
+    "Depth-ref": "Глубина",
     "Lab techn.": "Лаборант  ",
     "Lab techn": "Лаборант  ",
     Borehole: "Скважина ",
@@ -28,8 +28,8 @@ export function translatePlasticityText(text) {
     Blows: "Удары",
     Plate: "Пластина",
     "(gram)": "  (грамм)",
-    Wet: "     Водонас.",
-    Dry: "Маловлажн.",
+    Wet: "     Влаж. масса.",
+    Dry: "Сухая масса.",
   };
 
   const sortedKeys = Object.keys(translationMap).sort(
