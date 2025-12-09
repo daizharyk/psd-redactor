@@ -79,16 +79,13 @@ export default function PlasticityTranslator() {
               line.includes(
                 "Offshore Geotechnical Investigation Kashagan Phase IIA Project"
               );
-            const isBefore100 = line.includes("Водонас.");
+            const isBefore100 = line.includes("Влаж. масса.");
             const paddingBefore300 =
               line.includes("Проект") || line.includes("Project");
 
             const cleanLine = line.replace(/\s+/g, " ");
 
-            const paddingBefore200 =
-              cleanLine.includes("Образец Точка отсчета глуб") ||
-              cleanLine.includes("Sample Depth-ref") ||
-              cleanLine.includes("Среднее значение");
+            const paddingBefore200 = cleanLine.includes("Среднее значение");
 
             const paddingAfter100 =
               line.includes(
