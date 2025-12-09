@@ -158,7 +158,7 @@ export default function PlasticityTranslator() {
         <input
           id="file-upload"
           type="file"
-          accept=".docx"
+          accept=".doc,.docx"
           onChange={handleFileChange}
           style={{ display: "none" }}
         />
