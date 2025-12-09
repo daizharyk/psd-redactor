@@ -294,7 +294,7 @@ export default function PsdToRus() {
     });
 
     const newFileName = fileName
-      ? fileName.replace(/\.[^/.]+$/, "") + "_RUS.docx"
+      ? fileName.replace(/\.[^/.]+$/, "") + ".docx"
       : "translated_RUS.docx";
 
     try {
