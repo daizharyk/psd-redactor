@@ -21,7 +21,7 @@ export function translatePsdText(text) {
     "Project ": "Проект     ",
     Date: "Дата",
     Borehole: "Скважина   ",
-    Technician: "Техник-лаборант",
+    Technician: "Лаборант",
     Depth: "Глубина",
     Diameter: "Диаметр",
     Dispersity: "Дисперсность",

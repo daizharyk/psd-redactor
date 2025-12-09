@@ -3,7 +3,7 @@
 import { useState } from "react";
 import { translatePlasticityText } from "../utils/translatePlasticityText";
 import mammoth from "mammoth";
-import { AlignmentType, Document, Packer, Paragraph, TextRun } from "docx";
+ 
 import { saveAs } from "file-saver";
 import Styles from "./page.module.css";
 import GoBack from "@/button/goBack";
