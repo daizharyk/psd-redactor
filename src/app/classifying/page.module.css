@@ -1,0 +1,245 @@
+.wrapper {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  margin: 0 auto;
+  width: 100%;
+  height: 100vh;
+  padding: 24px;
+  gap: 40px;
+}
+
+.title {
+  display: flex;
+  gap: 12px;
+  margin-bottom: 20px;
+  align-items: center;
+  justify-content: center;
+  font-weight: bold;
+  font-size: 20px;
+  background-color: transparent;
+}
+
+.att {
+  background-color: #f0f0f0;
+  padding: 20px;
+  border-radius: 16px;
+  height: 200px;
+  width: 820px;
+}
+.sive {
+  padding: 20px;
+  border-radius: 16px;
+  height: 200px;
+  width: fit-content;
+}
+
+.form {
+  display: flex;
+  height: 60px;
+  background-color: transparent;
+  justify-content: space-between;
+}
+
+.form input {
+  padding: 8px;
+  background-color: aliceblue;
+  width: 90px;
+  height: 40px;
+  border-radius: 12px;
+  border: 1px solid #ccc;
+}
+
+.form button {
+  padding: 5px;
+  cursor: pointer;
+  border-radius: 12px;
+  background-color: #502da1;
+
+  color: white;
+  border: none;
+  font-size: 16px;
+  transition: 0.2s all ease-in-out;
+}
+.form button:hover {
+  background-color: #1d0b47;
+  color: azure;
+}
+
+.result {
+  margin-top: 12px;
+  font-weight: bold;
+  background-color: transparent;
+}
+.resultWrapper {
+  display: flex;
+
+  align-items: center;
+  flex-direction: column;
+  background-color: #e0e0e0;
+  gap: 10px;
+  margin-top: 10px;
+}
+
+.copyButton {
+  padding: 5px 10px;
+  margin-top: 30px;
+  cursor: pointer;
+  border: 1px solid #888;
+  background-color: #f0f0f0;
+  border-radius: 4px;
+}
+
+.copyButton:hover {
+  background-color: #e0e0e0;
+}
+
+/* page.module.css */
+.container {
+  max-width: 48rem;
+  margin: 0 auto;
+  padding: 1.5rem;
+  background: white; /* ❗ вместо градиента */
+  border-radius: 0.75rem;
+  box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
+}
+
+.card {
+  background: white;
+  border-radius: 0.5rem;
+  padding: 1.5rem;
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05);
+}
+
+.title {
+  background: white;
+  font-size: 1.5rem;
+  font-weight: bold;
+  color: #1e293b;
+  margin-bottom: 0.5rem;
+}
+
+.subtitle {
+  font-size: 0.875rem;
+  color: #475569;
+  margin-bottom: 1.5rem;
+  background-color: white;
+}
+
+.formSection {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+  background-color: white;
+}
+
+.gridThree {
+  display: grid;
+  background-color: white;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 1rem;
+}
+
+.gridTwo {
+  display: grid;
+  background-color: white;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 1rem;
+}
+
+.label {
+  display: block;
+  font-size: 0.875rem;
+  font-weight: 500;
+  color: #334155;
+  background-color: white;
+  margin-bottom: 0.25rem;
+}
+
+.input,
+.select {
+  width: 100%;
+  background-color: white;
+  padding: 0.5rem 0.75rem;
+  border: 1px solid #cbd5e1;
+  border-radius: 0.375rem;
+  font-size: 1rem;
+}
+
+.input:focus,
+.select:focus {
+  outline: none;
+}
+
+.button {
+  width: 100%;
+  background-color: #2563eb;
+  color: white;
+  font-weight: 500;
+  padding: 0.75rem 1rem;
+  border-radius: 0.375rem;
+  border: none;
+  cursor: pointer;
+  transition: background-color 0.2s;
+}
+
+.button:hover {
+  background-color: #1d4ed8;
+}
+
+.errorBox {
+  margin-top: 1rem;
+  padding: 1rem;
+  border-radius: 0.5rem;
+  background-color: #fef2f2;
+  border: 2px solid #fecaca;
+}
+
+.successBox {
+  margin-top: 1rem;
+  padding: 1rem;
+  border-radius: 0.5rem;
+  background-color: #f0fdf4;
+  border: 2px solid #bbf7d0;
+}
+
+.errorText {
+  color: #991b1b;
+  font-weight: 500;
+  background-color: white;
+}
+
+.resultLabel {
+  font-size: 0.875rem;
+  font-weight: 500;
+  color: #166534;
+  margin-bottom: 0.25rem;
+}
+
+.resultText {
+  font-size: 1.125rem;
+  font-weight: bold;
+  background-color: white;
+  color: #14532d;
+}
+
+.footer {
+  margin-top: 1.5rem;
+  padding-top: 1rem;
+  background-color: white;
+  border-top: 1px solid #e2e8f0;
+}
+
+.note {
+  font-size: 0.75rem;
+  color: #64748b;
+  background-color: white;
+}
+
+@media (max-width: 768px) {
+  .gridThree,
+  .gridTwo {
+    grid-template-columns: 1fr;
+  }
+}

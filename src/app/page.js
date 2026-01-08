@@ -21,6 +21,9 @@ const page = () => {
         <Link className={styles.button} href="/att-to-rus">
           ATT to RUS
         </Link>
+        <Link className={styles.button} href="/classifying">
+          Classifying
+        </Link>
       </div>
     </div>
   );
