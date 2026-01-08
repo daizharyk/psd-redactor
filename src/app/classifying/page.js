@@ -39,12 +39,21 @@ export default function Page() {
     setResult(result);
   };
 
+  const hasSieveData = values.c !== "" || values.d !== "" || values.e !== "";
+
   const handleCopy = () => {
     navigator.clipboard.writeText(result);
     setCopied(true);
     setTimeout(() => setCopied(false), 1500); // через 1.5 секунды вернем текст обратно
   };
-  function classifyATT(LL, PI, passing200, sandPercent, gravelPercent) {
+  function classifyATT(
+    LL,
+    PI,
+    passing200,
+    sandPercent,
+    gravelPercent,
+    hasSieveData
+  ) {
     let soilSymbol = "";
     let soilName = "";
 
@@ -63,6 +72,10 @@ export default function Page() {
     } else {
       alert("LL ≥ 50 — classification not implemented yet");
       return "Not classified";
+    }
+
+    if (!hasSieveData) {
+      return soilName.charAt(0).toUpperCase() + soilName.slice(1);
     }
 
     // --- COARSE FRACTION MODIFIERS ---
