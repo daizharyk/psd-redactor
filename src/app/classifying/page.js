@@ -109,7 +109,6 @@ export default function Page() {
 
     return `${finalName} `;
   }
-
   return (
     <div className={styles.wrapper}>
       <GoBack />
