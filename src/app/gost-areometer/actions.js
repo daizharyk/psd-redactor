@@ -10,6 +10,7 @@ import {
   AlignmentType,
   WidthType,
   TextRun,
+  Footer,
 } from "docx";
 
 import {
@@ -21,8 +22,11 @@ import {
 
 export async function generateReport(formData) {
   const {
+    projectNumber,
     sampleId,
+    mineNumber,
     depth,
+    testDate,
     hygroscopic,
     dryHumidity,
     soilWeight,
@@ -30,6 +34,8 @@ export async function generateReport(formData) {
     sieveWash,
     measurements,
   } = formData;
+
+  console.log("formData", formData);
 
   // 1. Считаем проценты по формуле для сухого сита
   const sieveDryPercents = calculateSieveDry(sieveDry, soilWeight);
@@ -76,7 +82,9 @@ export async function generateReport(formData) {
     sampleId: sampleId || "—",
     depth: depth || "—",
     soilWeight,
-
+    testDate: testDate || "—",
+    mineNumber: mineNumber || "—",
+    projectNumber: projectNumber || "—", // Добавляем номер проекта в объект данных
     // Проценты сухого сита
     f10_p: sieveDryPercents.f10 || "0.00",
     f10_5_p: sieveDryPercents.f10_5 || "0.00",
@@ -104,35 +112,115 @@ export async function generateReport(formData) {
     ...data.measurements.map((m) => parseFloat(m.percent) || 0),
   ];
 
-  console.log("All Percentages:", allPercentages);
-
   // Считаем общую сумму и округляем до 2 знаков
   const totalSum = allPercentages.reduce((acc, val) => acc + val, 0).toFixed(2);
 
-  console.log("Total Sum:", totalSum);
-
+  // 4. Создаем документ Word с ОДНОЙ общей таблицей
   // 4. Создаем документ Word с ОДНОЙ общей таблицей
   const doc = new Document({
+    styles: {
+      default: {
+        document: {
+          run: {
+            font: "Times New Roman",
+            size: 28, // 28 полупунктов = 14pt для всего документа
+          },
+        },
+      },
+    },
     sections: [
       {
+        // Переносим нижний блок в колонтитул (footer), чтобы он всегда был в самом низу страницы
+        footers: {
+          default: new Footer({
+            children: [
+              new Table({
+                width: { size: 100, type: WidthType.PERCENTAGE },
+                borders: {
+                  top: { style: "none", size: 0, color: "auto" },
+                  bottom: { style: "none", size: 0, color: "auto" },
+                  left: { style: "none", size: 0, color: "auto" },
+                  right: { style: "none", size: 0, color: "auto" },
+                  insideHorizontal: { style: "none", size: 0, color: "auto" },
+                  insideVertical: { style: "none", size: 0, color: "auto" },
+                },
+                rows: [
+                  new TableRow({
+                    children: [
+                      new TableCell({
+                        width: { size: 100, type: WidthType.PERCENTAGE },
+                        children: [
+                          // Первая строка: Название по центру крупным шрифтом
+                          new Paragraph({
+                            alignment: AlignmentType.CENTER,
+                            children: [
+                              new TextRun({
+                                text: "ГРАНУЛОМЕТРИЧЕСКИЙ СОСТАВ",
+                                bold: true,
+                                size: 30, // 16pt
+                              }),
+                            ],
+                            spacing: { after: 120 }, // небольшой отступ перед номером проекта
+                          }),
+                          new Paragraph({
+                            alignment: AlignmentType.CENTER,
+                            children: [
+                              new TextRun({
+                                text: "АРЕОМЕТРИЧЕСКИМ МЕТОДОМ",
+                                bold: true,
+                                size: 30, // 16pt
+                              }),
+                            ],
+                            spacing: { after: 120 }, // небольшой отступ перед номером проекта
+                          }),
+                          // Вторая строка: Номер проекта под названием (можно тоже по центру или слева)
+                          new Paragraph({
+                            alignment: AlignmentType.LEFT, // или AlignmentType.LEFT, если хотите прижать к левому краю
+                            children: [
+                              new TextRun({
+                                text: `Проект №: ${data.projectNumber || "—"}`,
+                                size: 24, // 12pt
+                              }),
+                            ],
+                          }),
+                        ],
+                      }),
+                    ],
+                  }),
+                ],
+              }),
+            ],
+          }),
+        },
         children: [
-          //   new Paragraph({
-          //     text: "ПРОТОКОЛ АРЕОМЕТРИЧЕСКОГО ИСПЫТАНИЯ (ГОСТ 12536-2014)",
-          //     heading: "Heading 1",
-          //     alignment: AlignmentType.CENTER,
-          //   }),
+          // Шапка документа с отступом сверху
           new Paragraph({
             children: [
               new TextRun({ text: "Лабораторный номер образца: ", bold: true }),
-              new TextRun({ text: `${data.sampleId}\n` }),
-              new TextRun({ text: "Номер выработки: ", bold: true }),
-              new TextRun({ text: `${data.mineNumber || "—"}\n` }), // Убедитесь, что передаете mineNumber из formData
-              new TextRun({ text: "Глубина отбора, м: ", bold: true }),
-              new TextRun({ text: `${data.depth}\n` }),
-              new TextRun({ text: "Дата испытания: ", bold: true }),
-              new TextRun({ text: `${data.testDate || "—"}` }), // Убедитесь, что передаете testDate из formData
+              new TextRun({ text: `${data.sampleId}` }),
             ],
-            spacing: { after: 300, line: 360 }, // Небольшой отступ после блока
+            spacing: {
+              before: 1300, // Отступ сверху от края страницы
+            },
+          }),
+          new Paragraph({
+            children: [
+              new TextRun({ text: "Номер выработки: ", bold: true }),
+              new TextRun({ text: `${data.mineNumber || "—"}` }),
+            ],
+          }),
+          new Paragraph({
+            children: [
+              new TextRun({ text: "Глубина отбора, м: ", bold: true }),
+              new TextRun({ text: `${data.depth}` }),
+            ],
+          }),
+          new Paragraph({
+            children: [
+              new TextRun({ text: "Дата испытания: ", bold: true }),
+              new TextRun({ text: `${data.testDate || "—"}` }),
+            ],
+            spacing: { after: 300 }, // Отступ после всей шапки перед таблицей
           }),
 
           // ЕДИНАЯ ОБЩАЯ ТАБЛИЦА
@@ -143,10 +231,22 @@ export async function generateReport(formData) {
               new TableRow({
                 children: [
                   new TableCell({
-                    children: [new Paragraph("Фракция")],
+                    children: [
+                      new Paragraph({
+                        children: [
+                          new TextRun({ text: "Фракция", bold: true }),
+                        ],
+                      }),
+                    ],
                   }),
                   new TableCell({
-                    children: [new Paragraph("Содержание (%)")],
+                    children: [
+                      new Paragraph({
+                        children: [
+                          new TextRun({ text: "Содержание (%)", bold: true }),
+                        ],
+                      }),
+                    ],
                   }),
                 ],
               }),
@@ -193,12 +293,10 @@ export async function generateReport(formData) {
                 ],
               }),
 
-              // Секция 2: Ситовый анализ с промывкой (по формуле 4.3.4.3)
+              // Секция 2: Ситовый анализ с промывкой
               new TableRow({
                 children: [
-                  new TableCell({
-                    children: [new Paragraph("0.5 - 0.25 мм")],
-                  }),
+                  new TableCell({ children: [new Paragraph("0.5 - 0.25 мм")] }),
                   new TableCell({
                     children: [new Paragraph(`${data.f05_025_p} %`)],
                   }),
@@ -206,9 +304,7 @@ export async function generateReport(formData) {
               }),
               new TableRow({
                 children: [
-                  new TableCell({
-                    children: [new Paragraph("0.25 - 0.1 мм")],
-                  }),
+                  new TableCell({ children: [new Paragraph("0.25 - 0.1 мм")] }),
                   new TableCell({
                     children: [new Paragraph(`${data.f025_01_p} %`)],
                   }),
@@ -225,20 +321,16 @@ export async function generateReport(formData) {
                 ],
               }),
 
-              // Секция 3: Ареометр (динамически разворачиваем массив измерений)
+              // Секция 3: Ареометр (динамические замеры)
               ...data.measurements.map((m, index) => {
-                // Задаем фиксированные названия для каждой строки ареометра по индексу (0, 1, 2)
                 let fractionLabel = "Ареометр";
                 if (index === 0) fractionLabel = "0.05 - 0.002 мм";
-                else if (index === 1)
-                  fractionLabel = "0.002 - 0.0002 мм"; // либо ваш вариант
+                else if (index === 1) fractionLabel = "0.002 - 0.0002 мм";
                 else if (index === 2) fractionLabel = "< 0.002 мм";
 
                 return new TableRow({
                   children: [
-                    new TableCell({
-                      children: [new Paragraph(fractionLabel)],
-                    }),
+                    new TableCell({ children: [new Paragraph(fractionLabel)] }),
                     new TableCell({
                       children: [new Paragraph(`${m.percent} %`)],
                     }),
@@ -246,7 +338,7 @@ export async function generateReport(formData) {
                 });
               }),
 
-              // ИТОГОВАЯ СТРОКА ТЕПЕРЬ СТРОГО ВНУТРИ МАССИВА rows ТАБЛИЦЫ
+              // ИТОГОВАЯ СТРОКА ТАБЛИЦЫ
               new TableRow({
                 children: [
                   new TableCell({
@@ -270,11 +362,6 @@ export async function generateReport(formData) {
                 ],
               }),
             ],
-          }),
-
-          new Paragraph({
-            text: "\n\nИсполнитель: _______________",
-            spacing: { before: 400 },
           }),
         ],
       },

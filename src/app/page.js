@@ -9,9 +9,7 @@ const page = () => {
         <Link className={styles.button} href="/psd">
           PSD Process
         </Link>
-        <Link className={styles.button} href="/psd-generator">
-          PSD Generator
-        </Link>
+
         <Link className={styles.button} href="/protocol">
           Сreate a protocol
         </Link>

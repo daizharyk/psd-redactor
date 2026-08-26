@@ -2,6 +2,7 @@
 import { useState } from "react";
 import { generateReport } from "./actions";
 import Styles from "./page.module.css";
+import GoBack from "@/button/goBack";
 
 export default function AreometerPage() {
   const [sampleId, setSampleId] = useState("");
@@ -37,6 +38,7 @@ export default function AreometerPage() {
     { time: "11 часов", value: "" },
   ]);
 
+  const [projectNumber, setProjectNumber] = useState(""); // Номер проекта
   const handleSieveDryChange = (field, value) => {
     setSieveDry({ ...sieveDry, [field]: value });
   };
@@ -53,8 +55,11 @@ export default function AreometerPage() {
 
   const handleDownload = async () => {
     const base64 = await generateReport({
+      projectNumber,
       sampleId,
+      mineNumber,
       depth,
+      testDate,
       hygroscopic, // передаем гигроскопическую влажность
       soilWeight, // передаем вес пробы
       sieveDry,
@@ -106,10 +111,12 @@ export default function AreometerPage() {
 
   return (
     <div className={Styles.container}>
+      <GoBack />
       <div className={Styles.wrapper}>
         <h1 className={Styles.h1}>Ареометрический метод (ГОСТ 12536)</h1>
 
         <div className={Styles.inputContainer}>
+          <label>Номер образца:</label>
           <input
             placeholder="Номер образца"
             value={sampleId}
@@ -118,15 +125,25 @@ export default function AreometerPage() {
         </div>
 
         {/* Новое поле: Номер выработки */}
+
         <div className={Styles.inputContainer}>
+          <label>Проект №:</label>
+          <input
+            placeholder="Номер выработки"
+            value={projectNumber}
+            onChange={(e) => setProjectNumber(e.target.value)}
+          />
+        </div>
+        <div className={Styles.inputContainer}>
+          <label>Номер выработки:</label>
           <input
             placeholder="Номер выработки"
             value={mineNumber}
             onChange={(e) => setMineNumber(e.target.value)}
           />
         </div>
-
         <div className={Styles.inputContainer}>
+          <label>Глубина:</label>
           <input
             placeholder="Глубина (м)"
             value={depth}
@@ -136,6 +153,7 @@ export default function AreometerPage() {
 
         {/* Новое поле: Дата испытания */}
         <div className={Styles.inputContainer}>
+          <label>Дата испытания:</label>
           <input
             type="date" // Удобно использовать выбор даты, либо оставить text, если нужен формат строку
             placeholder="Дата испытания"

@@ -21,10 +21,7 @@ export function calculateSieveDry(sieveDryData, soilWeight) {
 
   return results;
 }
-export  function dryHumidity (dryHumidity, hygroscopic) {
 
-    
-}
 // Расчет массы абсолютно сухой пробы грунта (g0) по формуле ГОСТ
 // g = масса пробы (dryHumidity из инпута)
 // W = гигроскопическая влажность в процентах (hygroscopic из инпута)
@@ -49,6 +46,7 @@ export function calculateSieveWash(
   dryHumidity,
   hygroscopic,
 ) {
+  const g0 = calculateG0(dryHumidity, hygroscopic);
   // Шаг Б: Считаем формулу 4.3.4.3 для каждой фракции с промывкой: X = (g_n / g_0) * (100 - K)
   const results = {};
   for (const [key, value] of Object.entries(sieveWashData)) {
@@ -59,7 +57,7 @@ export function calculateSieveWash(
 
     const gN = parseFloat(value); // масса конкретной фракции (gn)
     if (!isNaN(gN)) {
-      const X = (gN * 100) / dryHumidity;
+      const X = (gN * 100) / g0;
       results[key] = X.toFixed(2);
     } else {
       results[key] = "";
@@ -83,6 +81,7 @@ export function calculateAreometer(
   // Константы по ГОСТу
   const rhoS = 2.73;
 
+  const g0 = calculateG0(dryHumidity, hygroscopic);
   return measurements.map((m) => {
     // m.value — это Rn (показания ареометра с поправками) из инпутов
     const Rn = parseFloat(m.value);
@@ -92,7 +91,7 @@ export function calculateAreometer(
     }
 
     const A = rhoS * Rn * 100;
-    const B = 1.73 * dryHumidity;
+    const B = 1.73 * g0;
 
     const X = A / B; // Итоговый процент X для данного замера
     console.log("x", X);
@@ -106,8 +105,6 @@ export function calculateAreometer(
 export function processAreometerResults(data) {
   // Проверяем, что в массиве есть как минимум 3 элемента
   if (!data || data.length < 3) return data;
-
- 
 
   // Парсим проценты в числа для корректного вычитания
   const p1 = parseFloat(data[0].percent);
