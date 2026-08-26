@@ -69,7 +69,7 @@ export default function AreometerPage() {
     });
     const link = document.createElement("a");
     link.href = `data:application/vnd.openxmlformats-officedocument.wordprocessingml.document;base64,${base64}`;
-    link.download = `Отчет_${sampleId || "areometer"}.docx`;
+    link.download = `ГС_${sampleId || "areometer"}.docx`;
     link.click();
   };
 
