@@ -24,6 +24,9 @@ const page = () => {
         <Link className={styles.button} href="/classifying">
           Classifying
         </Link>
+        <Link className={styles.button} href="/gost-areometer">
+          ГОСТ Ареометр
+        </Link>
       </div>
     </div>
   );

@@ -1,0 +1,112 @@
+/* page.module.css */
+
+.container {
+  max-width: 600px;
+  margin: 40px auto;
+  padding: 0 20px;
+  font-family:
+    -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial,
+    sans-serif;
+
+  color: #333333;
+}
+
+.wrapper {
+  background: #ffffff;
+  padding: 30px;
+  border-radius: 12px;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.05);
+  border: 1px solid #eaeaea;
+}
+
+.sectionTitle {
+  background-color: transparent;
+}
+.h1 {
+  font-size: 1.5rem;
+  font-weight: 700;
+  color: #1a202c;
+  margin-bottom: 24px;
+  text-align: center;
+  background-color: transparent;
+}
+
+/* Заголовки секций вместо inline-стилей */
+.sectionTitle {
+  font-size: 1.3rem;
+  font-weight: 600;
+  color: #2c3e50;
+  margin-top: 24px;
+  font-weight: bold;
+
+  margin-bottom: 12px;
+  border-bottom: 1px solid #edf2f7;
+  padding-bottom: 6px;
+}
+
+.inputContainer {
+  display: flex;
+  align-items: center;
+
+  padding: 3px;
+  background-color: transparent;
+}
+
+.inputContainer label {
+  flex: 1;
+  font-size: 1.1rem;
+  color: #000000;
+  font-weight: 500;
+  background-color: transparent;
+}
+
+.inputContainer input {
+  flex: 1.5;
+  padding: 10px 14px;
+  border: 1px solid #cbd5e0;
+  border-radius: 6px;
+  font-size: 0.95rem;
+  outline: none;
+  transition:
+    border-color 0.2s,
+    box-shadow 0.2s;
+  background-color: #fff;
+}
+
+.inputContainer input:focus {
+  border-color: #3182ce;
+
+  box-shadow: 0 0 0 3px rgba(49, 130, 206, 0.15);
+}
+
+.inputError {
+  border: 2px solid #ff4d4f !important;
+
+  background-color: transparent;
+}
+
+.errorText {
+  color: #ff4d4f;
+  font-size: 12px;
+  margin-top: 4px;
+  display: block;
+  text-align: center;
+  background-color: white;
+}
+
+.button {
+  width: 100%;
+  padding: 12px;
+  background-color: #3182ce;
+  color: white;
+  border: none;
+  border-radius: 6px;
+  font-size: 1rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background-color 0.2s;
+}
+
+.button:hover {
+  background-color: #2b6cb0;
+}
