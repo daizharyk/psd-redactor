@@ -10,6 +10,9 @@
   },
   "dependencies": {
     "@netlify/plugin-nextjs": "^5.15.4",
+    "canvas": "^3.2.3",
+    "chart.js": "^4.5.1",
+    "chartjs-node-canvas": "^5.0.0",
     "docx": "^9.5.1",
     "file-saver": "^2.0.5",
     "fontkit": "^2.0.4",

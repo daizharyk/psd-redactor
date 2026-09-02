@@ -19,6 +19,7 @@ import {
   calculateSieveWash,
   processAreometerResults,
 } from "./calculations";
+import { generateGraphSection } from "./graphGen";
 
 export async function generateReport(formData) {
   const {
@@ -34,8 +35,6 @@ export async function generateReport(formData) {
     sieveWash,
     measurements,
   } = formData;
-
-  console.log("formData", formData);
 
   // 1. Считаем проценты по формуле для сухого сита
   const sieveDryPercents = calculateSieveDry(sieveDry, soilWeight);
@@ -363,6 +362,23 @@ export async function generateReport(formData) {
               }),
             ],
           }),
+        ],
+      },
+      {
+        children: [
+          new Paragraph({
+            alignment: AlignmentType.CENTER,
+            children: [
+              new TextRun({
+                text: "Кривая гранулометрического состава",
+                bold: true,
+                size: 28,
+              }),
+            ],
+            spacing: { after: 300, before: 200 },
+          }),
+          // Важно использовать оператор развертывания массива (...)
+          ...(await generateGraphSection(data)),
         ],
       },
     ],
