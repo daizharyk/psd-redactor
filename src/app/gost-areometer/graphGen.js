@@ -1,8 +1,21 @@
 import { Paragraph, ImageRun } from "docx";
-import { createCanvas } from "canvas";
+import { createCanvas, GlobalFonts } from "canvas";
 import { Chart, registerables } from "chart.js";
+import path from "path";
+
+import fs from "fs";
 
 Chart.register(...registerables);
+
+try {
+  // Вариант 1: Путь к файлу шрифта в папке public/fonts/arial.ttf
+  const fontPath = path.join(process.cwd(), "public", "fonts", "arial.ttf");
+  if (fs.existsSync(fontPath)) {
+    GlobalFonts.registerFromPath(fontPath, "Arial");
+  }
+} catch (e) {
+  console.error("Не удалось зарегистрировать системный шрифт:", e);
+}
 
 export async function generateGraphSection(data) {
   const width = 600;
