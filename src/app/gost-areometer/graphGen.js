@@ -45,6 +45,7 @@ export async function generateGraphSection(data) {
       if (index === 1) return "0.01 - 0.002 мм";
       return "< 0.002 мм";
     }),
+    "",
   ];
 
   const rawValues = [
@@ -56,19 +57,58 @@ export async function generateGraphSection(data) {
     parseFloat(data.f025_01_p) || 0,
     parseFloat(data.fLess1_p) || 0,
     ...(data.measurements || []).map((m) => parseFloat(m.percent) || 0),
+    0,
   ];
 
-  let cumulativeSum = 0;
-  const values = rawValues.map((val) => {
-    cumulativeSum += val;
-    return Math.min(parseFloat(cumulativeSum.toFixed(2)), 100);
-  });
+  // 2. Считаем кумуляцию стандартным циклом справа налево
+  const values = new Array(rawValues.length).fill(null);
 
+  let runningSum = 0;
+  let hasStarted = false;
+
+  for (let i = rawValues.length - 1; i >= 0; i--) {
+    const val = rawValues[i];
+
+    if (val > 0) {
+      hasStarted = true;
+    }
+
+    if (!hasStarted) {
+      continue;
+    }
+
+    runningSum += val;
+
+    if (val <= 0) {
+      values[i] = null;
+      continue;
+    }
+
+    values[i] = Math.min(parseFloat(runningSum.toFixed(2)), 100);
+  }
+
+  // 3. Вставляем дубликат точки прямо перед последним измерением (< 0.002 мм)
+  const measurementsCount = (data.measurements || []).length;
+  if (measurementsCount > 0) {
+    // Индекс последнего реального измерения в массиве rawValues
+    // (7 фиксированных сит + индекс последнего измерения)
+    const lastMeasIndex = 7 + measurementsCount - 1;
+
+    if (lastMeasIndex >= 0 && lastMeasIndex < rawValues.length) {
+      const lastVal = rawValues[lastMeasIndex];
+      const lastComputedVal = values[lastMeasIndex];
+
+      // Вставляем дубликат в rawValues и values перед последним элементом
+      // Дубликат получает ровно то же значение и НЕ участвует в повторном суммировании!
+      rawValues.splice(lastMeasIndex, 0, lastVal);
+      values.splice(lastMeasIndex, 0, lastComputedVal);
+    }
+  }
   // Кастомный плагин для отрисовки блоков разновидности грунтов в нижней части графика
   // Кастомный плагин для отрисовки ячеек разновидности грунтов с полноценными рамками
   const soilClassificationPlugin = {
     id: "soilClassification",
-    afterDraw(chart) {
+    beforeDatasetsDraw(chart) {
       const { ctx, chartArea, scales } = chart;
       const xAxis = scales.x;
       const bottomY = chartArea.bottom; // Низ области графика
@@ -81,15 +121,15 @@ export async function generateGraphSection(data) {
 
       const ranges = [
         { startIdx: 0, endIdx: 2, text: "Гравий" },
-        { startIdx: 2, endIdx: 4, text: "Песок" },
+        { startIdx: 2, endIdx: 7, text: "Песчаные" },
         {
-          startIdx: 4,
+          startIdx: 7,
           endIdx: labels.length - 2,
           text: "Пылеватые",
         },
         {
           startIdx: labels.length - 2,
-          endIdx: labels.length,
+          endIdx: labels.length - 1,
           text: "Глинистые",
         },
       ];
