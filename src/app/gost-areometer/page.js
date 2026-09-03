@@ -53,30 +53,39 @@ export default function AreometerPage() {
     setMeasurements(newMeasurements);
   };
 
+  const [isLoading, setIsLoading] = useState(false);
+
   const handleDownload = async () => {
-    const base64 = await generateReport({
-      projectNumber,
-      sampleId,
-      mineNumber,
-      depth,
-      testDate,
-      hygroscopic, // передаем гигроскопическую влажность
-      soilWeight, // передаем вес пробы
-      sieveDry,
-      sieveWash,
-      dryHumidity,
-      measurements,
-    });
-    const link = document.createElement("a");
-    link.href = `data:application/vnd.openxmlformats-officedocument.wordprocessingml.document;base64,${base64}`;
-    link.download = `ГС_${sampleId || "areometer"}.docx`;
-    link.click();
+    try {
+      const base64 = await generateReport({
+        projectNumber,
+        sampleId,
+        mineNumber,
+        depth,
+        testDate,
+        hygroscopic,
+        soilWeight,
+        sieveDry,
+        sieveWash,
+        dryHumidity,
+        measurements,
+      });
+      const link = document.createElement("a");
+      link.href = `data:application/vnd.openxmlformats-officedocument.wordprocessingml.document;base64,${base64}`;
+      link.download = `ГС_${sampleId || "areometer"}.docx`;
+      link.click();
+    } catch (error) {
+      console.error("Ошибка при генерации отчета:", error);
+      // Здесь можно показать уведомление об ошибке для пользователя, если нужно
+    }
   };
 
   // Внутри вашего компонента page.js:
   const [errors, setErrors] = useState({});
 
   const handleDownloadClick = async () => {
+    if (isLoading) return;
+
     const newErrors = {};
 
     // Проверяем ситовый анализ с промывкой
@@ -110,8 +119,15 @@ export default function AreometerPage() {
       return;
     }
 
-    // Если всё заполнено, вызываем вашу функцию генерации отчета
-    await handleDownload();
+    setIsLoading(true);
+
+    try {
+      // Вызываем генерацию отчета
+      await handleDownload();
+    } finally {
+      // В блоке finally выключаем загрузку и при успехе, и при ошибке
+      setIsLoading(false);
+    }
   };
 
   return (
@@ -344,10 +360,39 @@ export default function AreometerPage() {
 
         <button
           onClick={handleDownloadClick}
+          disabled={isLoading} // Блокируем кнопку во время загрузки
           className={Styles.button}
-          style={{ marginTop: "20px" }}
+          style={{
+            marginTop: "20px",
+            opacity: isLoading ? 0.7 : 1, // Делаем визуально чуть бледнее
+            cursor: isLoading ? "not-allowed" : "pointer", // Меняем курсор
+          }}
         >
-          Создать отчет
+          {isLoading ? (
+            <span
+              style={{
+                display: "inline-flex",
+                alignItems: "center",
+                gap: "8px",
+              }}
+            >
+              {/* Простой CSS-спиннер (крутящаяся иконка) */}
+              <span
+                style={{
+                  width: "16px",
+                  height: "16px",
+                  border: "2px solid #ffffff",
+                  borderTopColor: "transparent",
+                  borderRadius: "50%",
+                  display: "inline-block",
+                  animation: "spin 0.8s linear infinite",
+                }}
+              />
+              Генерация отчета...
+            </span>
+          ) : (
+            "Создать отчет"
+          )}
         </button>
       </div>
     </div>
