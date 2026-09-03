@@ -323,8 +323,8 @@ export async function generateReport(formData) {
               // Секция 3: Ареометр (динамические замеры)
               ...data.measurements.map((m, index) => {
                 let fractionLabel = "Ареометр";
-                if (index === 0) fractionLabel = "0.05 - 0.002 мм";
-                else if (index === 1) fractionLabel = "0.002 - 0.0002 мм";
+                if (index === 0) fractionLabel = "0.05 - 0.01 мм";
+                else if (index === 1) fractionLabel = "0.01 - 0.002 мм";
                 else if (index === 2) fractionLabel = "< 0.002 мм";
 
                 return new TableRow({

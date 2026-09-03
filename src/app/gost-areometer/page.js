@@ -90,6 +90,11 @@ export default function AreometerPage() {
       newErrors.f025_01 = "Заполните это поле";
     }
 
+    // Проверяем гигроскопическую влажность
+    if (!hygroscopic || hygroscopic.toString().trim() === "") {
+      newErrors.hygroscopic = "Заполните это поле";
+    }
+
     // Проверяем измерения ареометра
     measurements.forEach((m, i) => {
       if (!m.value || m.value.toString().trim() === "") {
@@ -165,13 +170,24 @@ export default function AreometerPage() {
         {/* Гигроскопическая влажность (произвольное значение) */}
         <div className={Styles.inputContainer}>
           <label>Гигроскопическая влажность (%):</label>
-          <input
-            type="number"
-            step="0.01"
-            placeholder="Введите значение"
-            value={hygroscopic}
-            onChange={(e) => setHygroscopic(e.target.value)}
-          />
+          <div className={Styles.inputWrapper}>
+            <input
+              type="number"
+              step="0.01"
+              placeholder="Введите значение"
+              value={hygroscopic}
+              className={errors.hygroscopic ? Styles.inputError : ""}
+              onChange={(e) => {
+                setHygroscopic(e.target.value);
+                if (errors.hygroscopic) {
+                  setErrors({ ...errors, hygroscopic: null });
+                }
+              }}
+            />
+            {errors.hygroscopic && (
+              <span className={Styles.errorText}>{errors.hygroscopic}</span>
+            )}
+          </div>
         </div>
         <div className={Styles.inputContainer}>
           <label>Проба воздушно-сухой влажности (г):</label>
