@@ -1,5 +1,5 @@
 import { Paragraph, ImageRun } from "docx";
-import { createCanvas, GlobalFonts } from "canvas";
+import { createCanvas, registerFont } from "canvas";
 import { Chart, registerables } from "chart.js";
 import path from "path";
 import { fileURLToPath } from "url";
@@ -10,11 +10,19 @@ Chart.register(...registerables);
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const fontPath = path.join(__dirname, "fonts", "arial.ttf");
 
-if (fs.existsSync(fontPath)) {
-  GlobalFonts.registerFromPath(fontPath, "Arial");
-  console.log("✅ Шрифт зарегистрирован:", fontPath);
-} else {
-  console.error("❌ ФАЙЛ ШРИФТА НЕ НАЙДЕН:", fontPath);
+// Защита от повторной регистрации при HMR/повторном импорте модуля
+if (!globalThis.__arialFontRegistered) {
+  try {
+    if (fs.existsSync(fontPath)) {
+      registerFont(fontPath, { family: "Arial" });
+      globalThis.__arialFontRegistered = true;
+      console.log("✅ Шрифт зарегистрирован:", fontPath);
+    } else {
+      console.error("❌ ФАЙЛ ШРИФТА НЕ НАЙДЕН:", fontPath);
+    }
+  } catch (e) {
+    console.error("⚠️ Ошибка при регистрации шрифта:", e.message);
+  }
 }
 
 export async function generateGraphSection(data) {
