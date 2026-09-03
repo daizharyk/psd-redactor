@@ -2,19 +2,19 @@ import { Paragraph, ImageRun } from "docx";
 import { createCanvas, GlobalFonts } from "canvas";
 import { Chart, registerables } from "chart.js";
 import path from "path";
-
+import { fileURLToPath } from "url";
 import fs from "fs";
 
 Chart.register(...registerables);
 
-try {
-  // Вариант 1: Путь к файлу шрифта в папке public/fonts/arial.ttf
-  const fontPath = path.join(process.cwd(), "public", "fonts", "arial.ttf");
-  if (fs.existsSync(fontPath)) {
-    GlobalFonts.registerFromPath(fontPath, "Arial");
-  }
-} catch (e) {
-  console.error("Не удалось зарегистрировать системный шрифт:", e);
+const __dirname = path.dirname(fileURLToPath(import.meta.url));
+const fontPath = path.join(__dirname, "fonts", "arial.ttf");
+
+if (fs.existsSync(fontPath)) {
+  GlobalFonts.registerFromPath(fontPath, "Arial");
+  console.log("✅ Шрифт зарегистрирован:", fontPath);
+} else {
+  console.error("❌ ФАЙЛ ШРИФТА НЕ НАЙДЕН:", fontPath);
 }
 
 export async function generateGraphSection(data) {
