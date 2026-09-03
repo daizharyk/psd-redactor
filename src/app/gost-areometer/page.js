@@ -51,6 +51,25 @@ export default function AreometerPage() {
     const newMeasurements = [...measurements];
     newMeasurements[index].value = value;
     setMeasurements(newMeasurements);
+
+    const newErrors = { ...errors };
+    const numVal = value === "" ? "" : parseFloat(value);
+
+    // Проверяем, что текущее значение не больше предыдущего (так как данные должны убывать)
+    if (index > 0 && numVal !== "" && newMeasurements[index - 1].value !== "") {
+      const prevVal = parseFloat(newMeasurements[index - 1].value);
+
+      if (!isNaN(prevVal) && !isNaN(numVal) && numVal > prevVal) {
+        newErrors[`measurement_${index}`] =
+          `Значение не должно быть больше предыдущего (${prevVal})`;
+      } else {
+        newErrors[`measurement_${index}`] = null;
+      }
+    } else {
+      newErrors[`measurement_${index}`] = null;
+    }
+
+    setErrors(newErrors);
   };
 
   const [isLoading, setIsLoading] = useState(false);
@@ -110,6 +129,17 @@ export default function AreometerPage() {
         newErrors[`measurement_${i}`] = "Заполните это поле";
       }
     });
+
+    // НОВАЯ ПРОВЕРКА: Проверяем, чтобы каждое следующее измерение не было больше предыдущего
+    for (let i = 1; i < measurements.length; i++) {
+      const current = parseFloat(measurements[i].value);
+      const previous = parseFloat(measurements[i - 1].value);
+
+      if (!isNaN(current) && !isNaN(previous) && current > previous) {
+        newErrors[`measurement_${i}`] =
+          `Значение не должно быть больше предыдущего (${previous})`;
+      }
+    }
 
     // Записываем ошибки в стейт
     setErrors(newErrors);
